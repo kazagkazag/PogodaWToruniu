@@ -42,7 +42,7 @@ function getWeatherForDay(day) {
   const data = {
     dayName: date.match(/[^\d]*/)[0],
     date: date.match(/\d{2}\.\d{2}/g)[0],
-    icon: cheerio(cells[1]).html().replace(/\s/g, "").match(/[a-z]*\.jpg/g)[0],
+    icon: cheerio(cells[1]).html().match(/[a-zA-Z0-9\s]*\.jpg/g)[0],
     tempMin: cheerio(cells[2]).text().replace(/\s/g, ""),
     tempMax: cheerio(cells[3]).text().replace(/\s/g, "")
   };

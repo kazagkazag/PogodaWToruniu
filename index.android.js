@@ -29,6 +29,7 @@ export default class PogodaWToruniu extends Component {
     };
 
     this.updateLayoutProperties = this.updateLayoutProperties.bind(this);
+    this.renderDayWeather = this.renderDayWeather.bind(this);
   }
 
   componentDidMount() {
@@ -58,10 +59,12 @@ export default class PogodaWToruniu extends Component {
   updateLayoutProperties(event) {
     const layout = event.nativeEvent.layout;
 
-    this.setState({
-      layoutWidth: layout.width,
-      layoutHeight: layout.height
-    });
+    if(layout.width !== this.state.layoutWidth || layout.height !== this.state.layoutHeight) {
+      this.setState({
+        layoutWidth: layout.width,
+        layoutHeight: layout.height
+      });
+    }
   }
 
   renderLoader() {
@@ -72,21 +75,37 @@ export default class PogodaWToruniu extends Component {
     ) : null;
   }
 
-  renderWeatherIcon(iconName) {
-      switch(iconName) {
-        case "zachmurzeniecalkowite.jpg":
-          return this.renderIcon("Cloud");
-        default:
-          return this.renderIcon("Sun");
-      }
+  renderWeatherIcon(iconName, width, height) {
+    switch(iconName) {
+      case "zachmurzeniecalkowite.jpg":
+        return this.renderIcon("Cloud", width, height);
+      case "snieg z deszczem NEW.jpg":
+        return this.renderIcon("Cloud", width, height);
+      case "zachmurzenie duze.jpg":
+      case "zachmurzenieduze.jpg":
+        return this.renderIcon("Cloud-Sun", width, height);
+      case "zachmurzenie duze i slaby deszcz.jpg":
+        return this.renderIcon("Cloud-Rain-Sun-Alt", width, height);
+      default:
+        return this.renderIcon("Sun", width, height);
+    }
   }
 
-  renderIcon(iconName) {
+  renderIcon(iconName, width, height) {
     let source = "";
 
     switch (iconName) {
       case "Cloud":
         source = require("./icons/Cloud.svg");
+        break;
+      case "Cloud-Hail":
+        source = require("./icons/Cloud-Hail.svg");
+        break;
+      case "Cloud-Sun":
+        source = require("./icons/Cloud-Sun.svg");
+        break;
+      case "Cloud-Rain-Sun-Alt":
+        source = require("./icons/Cloud-Rain-Sun-Alt.svg");
         break;
       default:
         source = require("./icons/Sun.svg");
@@ -95,8 +114,8 @@ export default class PogodaWToruniu extends Component {
 
     return (
       <SvgUri
-        width="30"
-        height="30"
+        width={width}
+        height={height}
         style={styles.todaylWeatherIcon}
         source={source}
       />
@@ -104,7 +123,7 @@ export default class PogodaWToruniu extends Component {
   }
 
   renderDaysWeather() {
-    return this.state.daysWeather.map((day, index) => this.renderDayWeather(day, index));
+    return this.state.daysWeather.map(this.renderDayWeather);
   }
 
   renderDayWeather(day, index) {
@@ -114,7 +133,7 @@ export default class PogodaWToruniu extends Component {
         key={index}
       >
         <View style={styles.dayWeatherIcon}>
-          {this.renderIcon(day.icon)}
+          {this.renderWeatherIcon(day.icon, 15, 15)}
         </View>
         <View style={styles.dayWeatherName}>
           <Text style={styles.dayWeatherNameDay}>
@@ -169,7 +188,7 @@ export default class PogodaWToruniu extends Component {
               </Text>
             </View>
             <View style={styles.todayWeatherIconContainer}>
-              {this.renderWeatherIcon(this.state.daysWeather[0].icon)}
+              {this.renderWeatherIcon(this.state.daysWeather[0].icon, 30, 30)}
             </View>
           </View>
         </View>
@@ -291,7 +310,7 @@ const styles = StyleSheet.create({
     color: "#fff"
   },
   dayWeatherNameDate: {
-    fontSize: 22,
+    fontSize: 24,
     color: "#fff"
   },
   dayWeatherTempContainer: {
@@ -300,7 +319,8 @@ const styles = StyleSheet.create({
   },
   dayWeatherTempTitle: {
     fontSize: 12,
-    color: "#fff"
+    color: "#fff",
+    opacity: 0.4
   },
   dayWeatherTemp: {
     flexDirection: "row"
